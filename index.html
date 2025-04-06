@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SpeakUp!</title>
+    <link href="fixed.css" rel="stylesheet" type="text/css" media="screen" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <style>
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        font-family: "Noto Sans", sans-serif;
+        scroll-behavior: smooth;
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      .nav-menu {
+        position: fixed;
+        top: 20px;
+        left: 22%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 20px;
+        background: rgba(0, 0, 0, 0.5);
+        padding: 10px 15px;
+        border-radius: 5px;
+        z-index: 1000; /* Ensure it's above all content */
+      }
+
+      .nav-menu a {
+        color: white;
+        text-decoration: none;
+        font-size: 18px;
+        font-weight: normal;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        padding: 10px 15px;
+        border-radius: 5px;
+        transition: background 0.3s ease-in-out;
+      }
+
+      /* Highlight active section */
+      .nav-menu a.active {
+        background: yellow;
+        color: black;
+      }
+
+      .hero,
+      .content {
+        text-align: center;
+        width: 100%;
+        padding: 60px 20px;
+      }
+
+      #hero1 {
+        background: url("Banner.png") no-repeat center center/cover;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        text-align: center;
+        width: 100%;
+      }
+
+      #hero2 {
+        height: 120vh; /* Ensure full screen height */
+        margin-top: 0; /* Remove extra margin */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        overflow: hidden; /* Prevent unwanted scrollbars */
+      }
+
+      #hero2 video {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        object-fit: cover; /* Ensures full coverage */
+        pointer-events: none;
+      }
+
+      #hero3 {
+        background: linear-gradient(to bottom, #c3e5ef, #67abeb);
+        height: 30vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+      }
+
+      .clickable-container {
+        position: absolute;
+        top: 59%; /* Adjust as needed */
+        left: 50%; /* Adjust as needed */
+        transform: translate(-50%, -50%);
+        width: 250px; /* Adjust width */
+        height: 287px; /* Adjust height */
+        background-color: rgba(255, 0, 0, 0.2); /* Light red, for testing */
+        opacity: 0%;
+        cursor: pointer;
+      }
+
+      .clickable-container1 {
+        position: absolute;
+        top: 59%; /* Adjust as needed */
+        left: 26%; /* Adjust as needed */
+        transform: translate(-50%, -50%);
+        width: 250px; /* Adjust width */
+        height: 287px; /* Adjust height */
+        background-color: rgba(255, 0, 0, 0.2); /* Light red, for testing */
+        opacity: 0%;
+        cursor: pointer;
+      }
+
+      .clickable-container2 {
+        position: absolute;
+        top: 59%; /* Adjust as needed */
+        left: 74%; /* Adjust as needed */
+        transform: translate(-50%, -50%);
+        width: 244px; /* Adjust width */
+        height: 287px; /* Adjust height */
+        background-color: rgba(255, 0, 0, 0.2); /* Light red, for testing */
+        cursor: pointer;
+        opacity: 0%;
+      }
+
+      .team-member {
+        display: flex;
+        flex-direction: row; /* Arrange items in a row */
+        align-items: center; /* Center vertically */
+        padding: 20px;
+        gap: 15px; /* Space between image and text */
+        width: 100%; /* Stretch full width */
+        justify-content: center; /* Center content */
+      }
+
+      .team-member img {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        border: 4px solid rgb(28, 106, 157);
+        object-fit: cover;
+      }
+
+      .team-info {
+        text-align: left; /* Align text to the left */
+        color: rgb(28, 106, 157);
+      }
+
+      h3 {
+        margin: 5px 0;
+      }
+
+      .social-icons {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        margin-top: 5px;
+      }
+
+      .social-icons a {
+        text-decoration: none; /* Remove underline */
+      }
+
+      .social-icons i {
+        font-size: 24px;
+        color: rgb(28, 106, 157);
+        transition: transform 0.3s;
+      }
+
+      .social-icons i:hover {
+        transform: scale(1.1);
+        color: #fff;
+      }
+
+      #hero4 {
+        background: url("About.png") no-repeat center center;
+        background-size: cover;
+        height: 90vh;
+        min-height: 100vh;
+        align-items: center;
+        text-align: center;
+      }
+
+      .features {
+        display: flex;
+        justify-content: center; /* Center content horizontally */
+        align-items: flex-start; /* Align items to the top */
+        gap: 40px; /* Space between features */
+        flex-wrap: wrap; /* Ensure responsiveness */
+        text-align: center;
+        padding-top: 50px; /* Adjust spacing from the top */
+      }
+
+      .feature {
+        display: flex;
+        flex-direction: column; /* Stack items vertically */
+        align-items: center; /* Center content */
+        width: 30%; /* Adjust width */
+      }
+
+      .feature i {
+        font-size: 93px;
+        color: #1c6a9d;
+        top: 100px; /* Move the icon up */
+      }
+
+      h3 {
+        margin-top: 20px;
+        font-weight: bold;
+        color: #fff;
+      }
+
+      p {
+        color: #fff;
+      }
+    </style>
+  </head>
+  <body>
+    <section id="hero1" class="hero">
+      <nav class="nav-menu">
+        <a href="#hero1" class="active">Home</a>
+        <a href="#hero2">Play It</a>
+        <a href="#hero3">Team</a>
+        <a href="#hero4">About</a>
+      </nav>
+    </section>
+
+    <section id="hero2" class="hero">
+      <video
+        autoplay
+        muted
+        loop
+        playsinline
+        style="
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          z-index: -1;
+        "
+      >
+        <source src="Book_Selection.mp4" type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
+      <div
+        class="clickable-container"
+        onclick="window.location.href='kitty.html'"
+      ></div>
+      <div
+        class="clickable-container1"
+        onclick="window.location.href='robot.html'"
+      ></div>
+      <div
+        class="clickable-container2"
+        onclick="window.location.href='astronaut.html'"
+      ></div>
+    </section>
+
+    <section id="hero3" class="hero">
+      <div class="team-member">
+        <img src="img.jpg" alt="Renan Barroncas" />
+        <div class="team-info">
+          <h3>Marsya Assyifa</h3>
+          <p>Fullstack Developer</p>
+          <div class="social-icons">
+            <a href="https://github.com/syifaqq29"
+              ><i class="fa-brands fa-github"></i
+            ></a>
+            <a
+              href="https://stackoverflow.com/users/25010034/marsya-assyifa-binti-mohammad"
+              ><i class="fa-brands fa-stack-overflow"></i
+            ></a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="hero4" class="hero">
+      <div class="features">
+        <div class="feature">
+          <i class="fa-solid fa-gamepad"></i>
+          <h3>Play it</h3>
+          <p>
+            Practice speaking with fun interactive stories and voice-activated
+            challenges!
+          </p>
+        </div>
+        <div class="feature">
+          <i class="fa-solid fa-microscope"></i>
+          <h3>Discover</h3>
+          <p>
+            Discover a world of adventure where your voice shapes the story!
+          </p>
+        </div>
+        <div class="feature">
+          <i class="fa-solid fa-book"></i>
+          <h3>Learn</h3>
+          <p>
+            Improve speech skills while having fun with engaging storytelling!
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const sections = document.querySelectorAll("section");
+        const navLinks = document.querySelectorAll(".nav-menu a");
+
+        function setActiveLink() {
+          let currentSection = "";
+
+          sections.forEach((section) => {
+            const sectionTop = section.offsetTop - 100; // Adjust for nav height
+            if (window.scrollY >= sectionTop) {
+              currentSection = section.getAttribute("id");
+            }
+          });
+
+          navLinks.forEach((link) => {
+            link.classList.remove("active");
+            if (link.getAttribute("href").substring(1) === currentSection) {
+              link.classList.add("active");
+            }
+          });
+        }
+
+        window.addEventListener("scroll", setActiveLink);
+      });
+
+      document.addEventListener("DOMContentLoaded", function () {
+        document.documentElement.style.scrollBehavior = "auto"; // Disable smooth scrolling on load
+        setTimeout(() => {
+          document.documentElement.style.scrollBehavior = "smooth"; // Re-enable after a delay
+        }, 500);
+      });
+
+      window.onload = function () {
+        window.scrollTo(0, 0);
+      };
+    </script>
+  </body>
+</html>

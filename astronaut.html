@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Icon -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <!-- Page flip sound -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
+    <title>The Brave Astronaut</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: rgb(213, 238, 245); /* Parchment color */
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font-family: "Garamond", serif;
+        overflow: hidden;
+      }
+
+      #book {
+        width: 90vw;
+        height: 85vh;
+        max-width: 1200px;
+        position: relative;
+        perspective: 1500px;
+        box-shadow: 0 30px 50px rgba(0, 0, 0, 0.3);
+        background: #3e699c;
+        border-radius: 10px;
+        padding: 20px;
+      }
+
+      #bookCover {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: #3e699c;
+        border-radius: 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        transform-origin: left center;
+        transition: transform 1s cubic-bezier(0.645, 0.045, 0.355, 1);
+        z-index: 10;
+        box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.3);
+        background-image: linear-gradient(135deg, #7cc1d6 0%, #3e699c 100%);
+        padding: 20px;
+        box-sizing: border-box;
+      }
+
+      #bookCover.open {
+        transform: rotateY(-140deg);
+      }
+
+      #coverTitle {
+        color: #fff;
+        font-size: 3rem;
+        margin-bottom: 20px;
+        text-align: center;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      }
+
+      #coverImage {
+        width: 50%;
+        max-width: 300px;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        margin-bottom: 30px;
+      }
+
+      #beginButton {
+        background-color: #fff;
+        color: #3e699c;
+        font-size: 1.5rem;
+        padding: 15px 30px;
+        border-radius: 30px;
+        border: none;
+        cursor: pointer;
+        font-weight: bold;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        transition: all 0.3s;
+      }
+
+      #beginButton:hover {
+        transform: scale(1.05);
+      }
+
+      #pages {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        transition: transform 0.5s;
+        display: none;
+      }
+
+      .page {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: #fff;
+        display: flex;
+        border-radius: 5px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        transform-origin: left center;
+        transition: transform 0.8s cubic-bezier(0.645, 0.045, 0.355, 1);
+        overflow: hidden;
+      }
+
+      .page-content {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        position: relative;
+        padding: 20px;
+        box-sizing: border-box;
+        background-color: #fff;
+      }
+
+      .video-side {
+        flex: 3;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        border-radius: 8px;
+        border: 8px solid #213b5a;
+        margin-right: 10px;
+      }
+
+      .text-side {
+        flex: 1;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      .page-number {
+        position: absolute;
+        bottom: 10px;
+        right: 20px;
+        font-size: 1.2rem;
+        color: #213b5a;
+        font-style: italic;
+      }
+
+      video {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        pointer-events: none;
+      }
+
+      h2 {
+        color: #213b5a;
+        font-size: 1.8rem;
+        margin-top: 0;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #213b5a;
+        padding-bottom: 10px;
+      }
+
+      p {
+        color: #213b5a;
+        font-size: 1.1rem;
+        line-height: 1.6;
+        margin-bottom: 20px;
+      }
+
+      .hint {
+        font-style: italic;
+        color: #213b5a;
+        margin-top: 10px;
+      }
+
+      .controls {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+        margin-top: 20px;
+      }
+
+      button {
+        padding: 12px 20px;
+        border-radius: 30px;
+        border: none;
+        background-color: #213b5a;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+        font-weight: bold;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s;
+        width: 100%;
+        max-width: 200px;
+      }
+
+      button:hover {
+        transform: scale(1.05);
+      }
+
+      #speakButton {
+        background-color: #213b5a;
+      }
+
+      .nav-buttons {
+        display: flex;
+        gap: 10px;
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      #pointsDisplay {
+        background-color: #213b5a;
+        color: #fff;
+        padding: 10px 15px;
+        border-radius: 20px;
+        font-weight: bold;
+        margin-bottom: 15px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        text-align: center;
+        width: 100%;
+      }
+
+      .bookmark {
+        position: absolute;
+        top: -20px;
+        right: 50px;
+        width: 40px;
+        height: 80px;
+        background-color: #7cc1d6;
+        z-index: 5;
+        border-radius: 5px;
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="book">
+      <!-- Book Cover -->
+      <div id="bookCover">
+        <h1 id="coverTitle">The Brave Astronaut</h1>
+        <video
+          id="coverVideo"
+          autoplay
+          muted
+          loop
+          style="
+            width: 300px;
+            height: 200px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            margin-bottom: 30px;
+            object-fit: cover;
+          "
+        >
+          <source src="Astronaut/s1.mp4" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+        <button id="beginButton">
+          Open Book <i class="fa-solid fa-book-open"></i>
+        </button>
+      </div>
+
+      <!-- Book Pages -->
+      <div id="pages">
+        <!-- Texture overlay -->
+        <div class="texture"></div>
+
+        <!-- Each page is loaded dynamically via JavaScript -->
+      </div>
+    </div>
+
+    <script>
+      // Audio setup
+      const sounds = {
+        pageFlip: new Howl({
+          src: ["flip.mp3"],
+          volume: 0.5,
+        }),
+        success: new Howl({
+          src: ["bonus.mp3"],
+          volume: 0.7,
+        }),
+        incorrect: new Howl({
+          src: ["buzz_sound.mp3"],
+          volume: 0.5,
+        }),
+        applause: new Howl({
+          src: [""],
+          volume: 0.5,
+        }),
+      };
+
+      const scenes = [
+        {
+          title: "The Mission Begins",
+          video: "Astronaut/s2.mp4",
+          correctVideo: "Astronaut/s2_correct.mp4",
+          incorrectVideo: "Astronaut/s2_incorrect.mp4",
+          text: "A spaceship stands on a launchpad, with a brave astronaut named Alex inside.",
+          hint: "Say 'launch' to start the countdown!",
+          keyword: "launch",
+          pauseAtSecond: 9,
+        },
+        {
+          title: "Lost in Space",
+          video: "Astronaut/s3.mp4",
+          correctVideo: "Astronaut/s3_correct.mp4",
+          incorrectVideo: "Astronaut/s3_incorrect.mp4",
+          text: "The spaceship is floating in space, but a meteor knocks Alex out of the ship!",
+          hint: "Say 'float' to help Alex use the jetpack!",
+          keyword: "float",
+        },
+        {
+          title: "The Broken Panel",
+          video: "Astronaut/s4.mp4",
+          correctVideo: "Astronaut/s4_correct.mp4",
+          incorrectVideo: "Astronaut/s4_incorrect.mp4",
+          text: "A broken panel on the spaceship is sparking.",
+          hint: "Say 'fix' to help Alex repair the panel!",
+          keyword: "fix",
+        },
+        {
+          title: "Landing on the Moon",
+          video: "Astronaut/s5.mp4",
+          correctVideo: "Astronaut/s5_correct.mp4",
+          incorrectVideo: "Astronaut/s5_incorrect.mp4",
+          text: "The spaceship approaches the moon, ready for landing.",
+          hint: "Say 'land' to help Alex touch down safely!",
+          keyword: "land",
+        },
+        {
+          title: "Mission Accomplished!",
+          video: "Astronaut/s6.mp4",
+          text: "Mission accomplished! Alex is the first astronaut to complete this brave journey!",
+          hint: "Great job! You helped Alex complete the mission! Check your final score below.",
+          keyword: "",
+        },
+      ];
+
+      // Game variables
+      let currentPage = 0;
+      let totalPages = scenes.length;
+      let points = 0;
+      let firstTrySuccess = Array(scenes.length).fill(false); // Track if each page was completed on first try
+
+      // DOM elements
+      const book = document.getElementById("book");
+      const bookCover = document.getElementById("bookCover");
+      const beginButton = document.getElementById("beginButton");
+      const pages = document.getElementById("pages");
+
+      // Speech Recognition Setup
+      let recognition;
+      function initSpeechRecognition() {
+        if (window.SpeechRecognition || window.webkitSpeechRecognition) {
+          recognition = new (window.SpeechRecognition ||
+            window.webkitSpeechRecognition)();
+          recognition.lang = "en-US";
+          recognition.continuous = false;
+          recognition.interimResults = false;
+        } else {
+          alert(
+            "Speech recognition not supported in this browser. Please try Chrome or Edge."
+          );
+        }
+      }
+      initSpeechRecognition();
+
+      // Event listeners
+      beginButton.addEventListener("click", openBook);
+
+      // Open the book
+      function openBook() {
+        sounds.pageFlip.play();
+        bookCover.classList.add("open");
+        setTimeout(() => {
+          pages.style.display = "block";
+          createPages();
+          loadPage(0);
+        }, 1000);
+      }
+
+      // Create all pages dynamically
+      function createPages() {
+        pages.innerHTML = ""; // Clear any existing pages
+
+        // Create a page for each scene
+        scenes.forEach((scene, index) => {
+          const page = document.createElement("div");
+          page.className = "page";
+          page.id = `page${index}`;
+          page.style.transform = `rotateY(${index === 0 ? "0deg" : "-180deg"})`;
+          page.style.zIndex = totalPages - index;
+
+          // Page content structure
+          page.innerHTML = `
+                <div class="page-content">
+                  <div class="video-side">
+                    <video id="video${index}">
+                      <source src="${scene.video}" type="video/mp4">
+                      Your browser does not support the video tag.
+                    </video>
+                  </div>
+                  <div class="text-side">
+                    <div>
+                      <h2>${scene.title}</h2>
+                      <p>${scene.text}</p>
+                      <p class="hint">${scene.hint}</p>
+                    </div>
+                    <div class="controls">
+                      <div id="pointsDisplay${index}">Points: ${points}</div>
+                      ${
+                        index < totalPages - 1
+                          ? `<button id="speakButton${index}" class="speakButton">
+                          <i class="fa-solid fa-microphone"></i> Speak Now
+                        </button>`
+                          : ""
+                      }
+                      <div class="nav-buttons">
+                        ${
+                          index > 0
+                            ? `<button id="prevButton${index}" class="prevButton" style="display: ${
+                                index === 2 ? "block" : "none"
+                              };">
+                            <i class="fa-solid fa-arrow-left"></i> Back
+                          </button>`
+                            : ""
+                        }
+                        ${
+                          index === totalPages - 1
+                            ? `<button id="restartButton" class="restartButton">
+                            Restart <i class="fa-solid fa-rotate"></i>
+                          </button>`
+                            : ""
+                        }
+                      </div>
+                    </div>
+                  </div>
+                  <div class="page-number">${index + 1}</div>
+                  ${
+                    index < totalPages - 1
+                      ? '<div class="page-corner"></div>'
+                      : ""
+                  }
+                </div>
+              `;
+
+          pages.appendChild(page);
+        });
+
+        document.querySelectorAll(".speakButton").forEach((button, index) => {
+          button.addEventListener("click", () => startRecognition(index));
+        });
+
+        document.querySelectorAll(".prevButton").forEach((button, index) => {
+          button.addEventListener("click", () => flipToPrevPage(index));
+        });
+
+        document.querySelectorAll(".page-corner").forEach((corner, index) => {
+          corner.addEventListener("click", () => {
+            // Removed next button logic as it's now automatic
+          });
+        });
+
+        // Restart button on last page
+        const restartButton = document.getElementById("restartButton");
+        if (restartButton) {
+          restartButton.addEventListener("click", () => {
+            points = 0;
+            firstTrySuccess = Array(scenes.length).fill(false);
+            loadPage(0);
+          });
+        }
+      }
+
+      // Load specific page with improved video and recognition handling
+      function loadPage(pageIndex) {
+        currentPage = pageIndex;
+
+        // Reset all pages
+        document.querySelectorAll(".page").forEach((page, index) => {
+          page.style.transform =
+            index <= pageIndex ? "rotateY(0deg)" : "rotateY(-180deg)";
+          page.style.zIndex = totalPages - Math.abs(pageIndex - index);
+        });
+
+        // Get the video for this page
+        const video = document.getElementById(`video${pageIndex}`);
+        if (video) {
+          // Clear any existing event listeners
+          video.onended = null;
+          video.ontimeupdate = null;
+
+          // Reset video source
+          video.src = scenes[pageIndex].video;
+          video.load();
+
+          // Special handling for first page (launch scene)
+          if (pageIndex === 0 && scenes[pageIndex].pauseAtSecond) {
+            video.onloadedmetadata = () => {
+              // Add a time update listener for precise pausing
+              video.addEventListener("timeupdate", function pauseHandler() {
+                if (video.currentTime >= scenes[pageIndex].pauseAtSecond) {
+                  video.pause();
+                  video.removeEventListener("timeupdate", pauseHandler);
+
+                  // Trigger speak button after pause
+                  setTimeout(() => {
+                    const speakButton = document.getElementById(
+                      `speakButton${pageIndex}`
+                    );
+                    if (speakButton) {
+                      speakButton.click();
+                    }
+                  }, 500);
+                }
+              });
+            };
+          }
+
+          // Play the video
+          const playPromise = video.play();
+
+          // Handle video play promise
+          if (playPromise !== undefined) {
+            playPromise
+              .then(() => {
+                console.log(`Video for page ${pageIndex} started playing`);
+              })
+              .catch((error) => {
+                console.error(
+                  `Error playing video for page ${pageIndex}:`,
+                  error
+                );
+              });
+          }
+
+          // Auto-trigger speak or next page for other pages
+          if (pageIndex !== 0) {
+            video.onended = () => {
+              if (pageIndex < totalPages - 1) {
+                const speakButton = document.getElementById(
+                  `speakButton${pageIndex}`
+                );
+                if (speakButton) {
+                  setTimeout(() => {
+                    speakButton.click();
+                  }, 500);
+                }
+              }
+            };
+          }
+        }
+
+        // Update points display
+        updatePointsDisplay();
+      }
+
+      function startRecognition(pageIndex) {
+        // Add a flag to track if the page has been completed
+        if (!window.pageCompletedFlags) {
+          window.pageCompletedFlags = new Array(scenes.length).fill(false);
+        }
+
+        // If the page is already completed, exit the function
+        if (window.pageCompletedFlags[pageIndex]) {
+          console.log(`Page ${pageIndex + 1} already completed`);
+          return;
+        }
+
+        // Ensure we stop any existing recognition
+        if (recognition) {
+          try {
+            recognition.stop();
+          } catch (error) {
+            console.log("Error stopping existing recognition:", error);
+          }
+        }
+
+        // Reinitialize speech recognition
+        initSpeechRecognition();
+
+        if (!recognition) return;
+
+        const speakButton = document.getElementById(`speakButton${pageIndex}`);
+        if (!speakButton) {
+          console.error(`No speak button found for page ${pageIndex}`);
+          return;
+        }
+
+        // Reset button state
+        function resetButton() {
+          speakButton.innerHTML =
+            '<i class="fa-solid fa-microphone"></i> Speak Now';
+          speakButton.style.backgroundColor = "#213b5a";
+        }
+
+        // Set button to listening state
+        function setListeningState() {
+          speakButton.innerHTML =
+            '<i class="fa-solid fa-microphone"></i> Listening...';
+          speakButton.style.backgroundColor = "#7cc1d6";
+        }
+
+        // Clear previous event listeners to prevent multiple bindings
+        recognition.onstart = null;
+        recognition.onerror = null;
+        recognition.onresult = null;
+        recognition.onend = null;
+
+        recognition.onstart = () => {
+          console.log(`Listening for Page ${pageIndex + 1}...`);
+          setListeningState();
+        };
+
+        recognition.onerror = (event) => {
+          console.error(
+            `Speech recognition error on Page ${pageIndex + 1}:`,
+            event.error
+          );
+          resetButton();
+
+          // Automatically restart recognition for certain errors
+          if (event.error === "no-speech" || event.error === "aborted") {
+            if (!window.pageCompletedFlags[pageIndex]) {
+              setTimeout(() => {
+                try {
+                  recognition.start();
+                } catch (restartError) {
+                  console.error("Failed to restart recognition:", restartError);
+                }
+              }, 500);
+            }
+          }
+        };
+
+        recognition.onresult = function (event) {
+          const speechResult = event.results[0][0].transcript.toLowerCase();
+          console.log(`User said on Page ${pageIndex + 1}:`, speechResult);
+
+          // Reset button
+          resetButton();
+
+          // Get scene data
+          const scene = scenes[pageIndex];
+
+          // Get the current video
+          const video = document.getElementById(`video${pageIndex}`);
+
+          // Check if the user said the correct keyword
+          if (speechResult.includes(scene.keyword)) {
+            // Mark the page as completed
+            window.pageCompletedFlags[pageIndex] = true;
+
+            // Correct response
+            sounds.success.play();
+
+            // Use correct video path
+            video.src = scene.correctVideo;
+            video.load();
+            video.play();
+
+            // Award points if this is the first successful attempt
+            if (!firstTrySuccess[pageIndex]) {
+              points += 10;
+              firstTrySuccess[pageIndex] = true;
+              updatePointsDisplay();
+            }
+
+            // Auto flip to next page after a short delay
+            if (pageIndex < totalPages - 1) {
+              setTimeout(() => {
+                loadPage(pageIndex + 1);
+              }, 2000); // 2 second delay to let user see the success
+            }
+          } else {
+            // Incorrect response
+            sounds.incorrect.play();
+
+            // Play the incorrect video if exists
+            if (scene.incorrectVideo) {
+              video.src = scene.incorrectVideo;
+              video.load();
+              video.play();
+
+              // Automatically reopen speak button after incorrect response
+              video.onended = () => {
+                // Only reopen if the page is not completed
+                if (!window.pageCompletedFlags[pageIndex]) {
+                  speakButton.click();
+                }
+              };
+            }
+          }
+        };
+
+        recognition.onend = () => {
+          resetButton();
+        };
+
+        // Start recognition
+        try {
+          recognition.start();
+        } catch (error) {
+          console.error(
+            `Failed to start recognition for Page ${pageIndex + 1}:`,
+            error
+          );
+        }
+      }
+
+      // Flip to previous page
+      function flipToPrevPage(currentIndex) {
+        if (currentIndex > 0) {
+          sounds.pageFlip.play();
+          setTimeout(() => {
+            loadPage(currentIndex - 1);
+          }, 500);
+        }
+      }
+
+      // Update points display on all pages
+      function updatePointsDisplay() {
+        for (let i = 0; i < totalPages; i++) {
+          const pointsDisplay = document.getElementById(`pointsDisplay${i}`);
+          if (pointsDisplay) {
+            pointsDisplay.textContent = `Points: ${points}`;
+          }
+        }
+      }
+    </script>
+  </body>
+</html>
